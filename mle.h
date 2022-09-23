@@ -4,10 +4,16 @@
 #include <stdint.h>
 #include <limits.h>
 #include <uthash.h>
+#if USE_USERSCRIPT == 1
 #include <lua5.4/lua.h>
 #include <lua5.4/lualib.h>
 #include <lua5.4/lauxlib.h>
+#endif
+#if USE_GIVEN_TERMBOX == 1
 #include "termbox2.h"
+#else
+#include <termbox.h>
+#endif
 #include "mlbuf.h"
 
 // Typedefs
@@ -38,8 +44,10 @@ typedef struct prompt_history_s prompt_history_t; // A map of prompt histories k
 typedef struct prompt_hnode_s prompt_hnode_t; // A node in a linked list of prompt history
 typedef int (*cmd_func_t)(cmd_context_t *ctx); // A command function
 typedef int (*observer_func_t)(char *event_name, void *event_data, void *udata); // An event callback function
+#if USE_USERSCRIPT == 1
 typedef struct uscript_s uscript_t; // A userscript
 typedef struct uhandle_s uhandle_t; // A method handle in a uscript
+#endif
 
 // kinput_t
 struct kinput_s {
@@ -95,7 +103,9 @@ struct editor_s {
     char *kmap_init_name;
     kmap_t *kmap_init;
     aproc_t *aprocs;
+#if USE_USERSCRIPT == 1
     uscript_t *uscripts;
+#endif
     observer_t *observers;
     FILE *tty;
     int ttyfd;
@@ -389,6 +399,7 @@ struct prompt_hnode_s {
     prompt_hnode_t *next;
 };
 
+#if USE_USERSCRIPT == 1
 // uscript_t
 struct uscript_s {
     editor_t *editor;
@@ -405,6 +416,7 @@ struct uhandle_s {
     uhandle_t *next;
     uhandle_t *prev;
 };
+#endif
 
 // editor functions
 int editor_init(editor_t *editor, int argc, char **argv);
@@ -575,9 +587,11 @@ int aproc_set_owner(aproc_t *aproc, void *owner, aproc_t **owner_aproc);
 int aproc_destroy(aproc_t *aproc, int preempt);
 int aproc_drain_all(aproc_t *aprocs, int *ttyfd);
 
+#if USE_USERSCRIPT == 1
 // uscript functions
 uscript_t *uscript_run(editor_t *editor, char *path);
 int uscript_destroy(uscript_t *uscript);
+#endif
 
 // util functions
 int util_shell_exec(editor_t *editor, char *cmd, long timeout_s, char *input, size_t input_len, int setsid, char *opt_shell, char **optret_output, size_t *optret_output_len, int *optret_exit_code);

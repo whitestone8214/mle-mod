@@ -2164,7 +2164,9 @@ static int _editor_init_from_args(editor_t *editor, int argc, char **argv) {
     int rv;
     kmap_t *cur_kmap;
     syntax_t *cur_syntax;
+#if USE_USERSCRIPT == 1
     uscript_t *uscript;
+#endif
     int c;
     rv = MLE_OK;
 
@@ -2298,6 +2300,7 @@ static int _editor_init_from_args(editor_t *editor, int argc, char **argv) {
             case 'w':
                 editor->soft_wrap = atoi(optarg);
                 break;
+#if USE_USERSCRIPT == 1
             case 'x':
                 if (!(uscript = uscript_run(editor, optarg))) {
                     MLE_LOG_ERR("Failed to run uscript: %s\n", optarg);
@@ -2307,6 +2310,7 @@ static int _editor_init_from_args(editor_t *editor, int argc, char **argv) {
                     DL_APPEND(editor->uscripts, uscript);
                 }
                 break;
+#endif
             case 'y':
                 editor->syntax_override = strcmp(optarg, "-") == 0 ? "syn_generic" : optarg;
                 break;
